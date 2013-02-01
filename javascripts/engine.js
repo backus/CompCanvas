@@ -20,7 +20,6 @@ $(document).ready(function() {
 	});
 
 	canvas.addChild(pentagon);
-	canvas.addChild(line);
 
 	var dragOptions = { changeZindex: true };
 
@@ -30,9 +29,10 @@ $(document).ready(function() {
 		pentagon.rotation--;
 	});
 
-	$("#rotate-toggle").click(function() {
-		var name = prompt("How :","Your name");
-		alert("Your name is " + name);
+	$("#draw-ground").click(function() {
+
+		canvas.addChild(line);
+
 		if (canvas.timeline.running) {
 			canvas.timeline.stop();
 		} 
