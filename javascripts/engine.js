@@ -1,51 +1,44 @@
 $(document).ready(function() {
+
 	var canvas = oCanvas.create({
 		canvas: "#canvas"
 	});
 
-	var arc = canvas.display.arc({
-		x: canvas.width / 3.5,
-		y: canvas.width / 5 + 150,
-		radius: 60,
-		start: 40,
-		end: 260,
-		fill: "#079",
-		pieSection: true
-	});
 	var pentagon = canvas.display.polygon({
 		x: canvas.width / 1.5,
-		y: arc.y,
+		y: canvas.width / 1.5,
 		sides: 5,
 		radius: 60,
 		fill: "#18a"
 	});
-	var hexagon = pentagon.clone({ sides: 6, x: arc.x, y: pentagon.y + 180, fill: "#29b" });
-	var heptagon = pentagon.clone({ sides: 7, x: pentagon.x, y: hexagon.y, fill: "#3ac" });
 
-	canvas.addChild(arc);
+	var line = canvas.display.line({
+		start: { x: 80, y: 60 },
+		end: { x: 280, y: 170 },
+		stroke: "20px #0aa",
+		cap: "round"
+	});
+
 	canvas.addChild(pentagon);
-	canvas.addChild(hexagon);
-	canvas.addChild(heptagon);
+	canvas.addChild(line);
 
 	var dragOptions = { changeZindex: true };
 
-	arc.dragAndDrop(dragOptions);
 	pentagon.dragAndDrop(dragOptions);
-	hexagon.dragAndDrop(dragOptions);
-	heptagon.dragAndDrop(dragOptions);
 
 	canvas.setLoop(function () {
-		arc.rotation++;
 		pentagon.rotation--;
-		hexagon.rotation++;
-		heptagon.rotation--;
 	});
 
 	$("#rotate-toggle").click(function() {
+		var name = prompt("How :","Your name");
+		alert("Your name is " + name);
 		if (canvas.timeline.running) {
 			canvas.timeline.stop();
-		} else {
+		} 
+		else {
 			canvas.timeline.start();
 		}
 	});
+
 });
