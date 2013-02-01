@@ -1,74 +1,73 @@
 $(document).ready(function() {
-	var canvas = oCanvas.create({ canvas: "#canvas", background: "#222" });
-
-// Center planet
-var center = canvas.display.ellipse({
-	x: canvas.width / 2, y: canvas.height / 2,
-	radius: canvas.width / 20,
-	fill: "#fff"
-}).add();
-
-// Prototype objects that will be used to instantiate the others
-var satelliteProto = canvas.display.ellipse({ fill: "#eee" });
-var pathProto = canvas.display.ellipse({ stroke: "1px #999" });
-
-// Set up data
-var satellites = [], depth = 3;
-var satelliteColors = ["#107B99", "#5F92C0", "#c7509f"];
-var pathColors = ["#666", "#107B99", "#5F92C0"];
-
-// Create seven satellites and paths. Definition is further down.
-for (var i = 0, l = 7; i < l; i++) {
-	createSatellite({
-		parent: center, depth: 1,
-		distance: (i + 1) * canvas.width / 6,
-		radius: canvas.width / 100,
-		speed: 1
-	});
-}
-
-// Set up a tick function that will move all satellites each frame
-canvas.setLoop(function () {
-	for (var i = 0, l = satellites.length; i < l; i++) {
-		satellites[i].rotation += satellites[i].speed;
-	}
+var canvas = oCanvas.create({
+	canvas: "#canvas"
 });
 
-// Definition for a satellite and its corresponding path
-function createSatellite (options) {
+var button = canvas.display.rectangle({
+	x: canvas.width / 2,
+	y: canvas.width / 5,
+	origin: { x: "center", y: "center" },
+	width: 300,
+	height: 40,
+	fill: "#079",
+	stroke: "10px #079",
+	join: "round"
+});
+var buttonText = canvas.display.text({
+	x: 0,
+	y: 0,
+	origin: { x: "center", y: "center" },
+	align: "center",
+	font: "bold 25px sans-serif",
+	text: "Toggle Rotation",
+	fill: "#fff"
+});
+button.addChild(buttonText);
 
-	// Create the path that the satellite will follow
-	var path = pathProto.clone({
-		radius: options.distance,
-		x: options.x || 0, y: options.y || 0,
-		strokeColor: pathColors[options.depth - 1]
-	});
-	options.parent.addChild(path);
+var arc = canvas.display.arc({
+	x: canvas.width / 3.5,
+	y: button.y + 150,
+	radius: 60,
+	start: 40,
+	end: 260,
+	fill: "#079",
+	pieSection: true
+});
+var pentagon = canvas.display.polygon({
+	x: canvas.width / 1.5,
+	y: arc.y,
+	sides: 5,
+	radius: 60,
+	fill: "#18a"
+});
+var hexagon = pentagon.clone({ sides: 6, x: arc.x, y: pentagon.y + 180, fill: "#29b" });
+var heptagon = pentagon.clone({ sides: 7, x: pentagon.x, y: hexagon.y, fill: "#3ac" });
 
-	// Create a new satellite
-	var satellite = satelliteProto.clone({
-		origin: {
-			x: 0,
-			y: options.distance * (Math.round(Math.random()) ? 1 : -1)
-		},
-		speed: Math.random() * (2 * Math.random() - 0.5) + 0.5,
-		radius: options.radius,
-		x: options.x || 0, y: options.y || 0,
-		fill: satelliteColors[options.depth - 1],
-		rotation: Math.random() * 360
-	});
-	options.parent.addChild(satellite);
-	satellites.push(satellite);
+canvas.addChild(arc);
+canvas.addChild(pentagon);
+canvas.addChild(hexagon);
+canvas.addChild(heptagon);
+canvas.addChild(button);
 
-	// Create another satellite that will circle around this satellite
-	if (options.depth < depth) {
-		createSatellite({
-			parent: satellite, depth: options.depth + 1,
-			distance: options.radius * 7,
-			radius: options.radius / 1.5,
-			x: satellite.origin.x * -1, y: satellite.origin.y * -1,
-			speed: 10
-		});
+var dragOptions = { changeZindex: true };
+
+arc.dragAndDrop(dragOptions);
+pentagon.dragAndDrop(dragOptions);
+hexagon.dragAndDrop(dragOptions);
+heptagon.dragAndDrop(dragOptions);
+
+canvas.setLoop(function () {
+	arc.rotation++;
+	pentagon.rotation--;
+	hexagon.rotation++;
+	heptagon.rotation--;
+});
+
+button.bind("click tap", function () {
+	if (canvas.timeline.running) {
+		canvas.timeline.stop();
+	} else {
+		canvas.timeline.start();
 	}
-}
+});
 });
