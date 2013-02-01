@@ -1,73 +1,51 @@
 $(document).ready(function() {
-var canvas = oCanvas.create({
-	canvas: "#canvas"
-});
+	var canvas = oCanvas.create({
+		canvas: "#canvas"
+	});
 
-var button = canvas.display.rectangle({
-	x: canvas.width / 2,
-	y: canvas.width / 5,
-	origin: { x: "center", y: "center" },
-	width: 300,
-	height: 40,
-	fill: "#079",
-	stroke: "10px #079",
-	join: "round"
-});
-var buttonText = canvas.display.text({
-	x: 0,
-	y: 0,
-	origin: { x: "center", y: "center" },
-	align: "center",
-	font: "bold 25px sans-serif",
-	text: "Toggle Rotation",
-	fill: "#fff"
-});
-button.addChild(buttonText);
+	var arc = canvas.display.arc({
+		x: canvas.width / 3.5,
+		y: canvas.width / 5 + 150,
+		radius: 60,
+		start: 40,
+		end: 260,
+		fill: "#079",
+		pieSection: true
+	});
+	var pentagon = canvas.display.polygon({
+		x: canvas.width / 1.5,
+		y: arc.y,
+		sides: 5,
+		radius: 60,
+		fill: "#18a"
+	});
+	var hexagon = pentagon.clone({ sides: 6, x: arc.x, y: pentagon.y + 180, fill: "#29b" });
+	var heptagon = pentagon.clone({ sides: 7, x: pentagon.x, y: hexagon.y, fill: "#3ac" });
 
-var arc = canvas.display.arc({
-	x: canvas.width / 3.5,
-	y: button.y + 150,
-	radius: 60,
-	start: 40,
-	end: 260,
-	fill: "#079",
-	pieSection: true
-});
-var pentagon = canvas.display.polygon({
-	x: canvas.width / 1.5,
-	y: arc.y,
-	sides: 5,
-	radius: 60,
-	fill: "#18a"
-});
-var hexagon = pentagon.clone({ sides: 6, x: arc.x, y: pentagon.y + 180, fill: "#29b" });
-var heptagon = pentagon.clone({ sides: 7, x: pentagon.x, y: hexagon.y, fill: "#3ac" });
+	canvas.addChild(arc);
+	canvas.addChild(pentagon);
+	canvas.addChild(hexagon);
+	canvas.addChild(heptagon);
 
-canvas.addChild(arc);
-canvas.addChild(pentagon);
-canvas.addChild(hexagon);
-canvas.addChild(heptagon);
-canvas.addChild(button);
+	var dragOptions = { changeZindex: true };
 
-var dragOptions = { changeZindex: true };
+	arc.dragAndDrop(dragOptions);
+	pentagon.dragAndDrop(dragOptions);
+	hexagon.dragAndDrop(dragOptions);
+	heptagon.dragAndDrop(dragOptions);
 
-arc.dragAndDrop(dragOptions);
-pentagon.dragAndDrop(dragOptions);
-hexagon.dragAndDrop(dragOptions);
-heptagon.dragAndDrop(dragOptions);
+	canvas.setLoop(function () {
+		arc.rotation++;
+		pentagon.rotation--;
+		hexagon.rotation++;
+		heptagon.rotation--;
+	});
 
-canvas.setLoop(function () {
-	arc.rotation++;
-	pentagon.rotation--;
-	hexagon.rotation++;
-	heptagon.rotation--;
-});
-
-button.bind("click tap", function () {
-	if (canvas.timeline.running) {
-		canvas.timeline.stop();
-	} else {
-		canvas.timeline.start();
-	}
-});
+	$("#rotate-toggle").click(function() {
+		if (canvas.timeline.running) {
+			canvas.timeline.stop();
+		} else {
+			canvas.timeline.start();
+		}
+	});
 });
